@@ -7,7 +7,7 @@ class FiniteBinaryAutomaton(ABC):
     @property
     @abstractmethod
     def state(self) -> np.ndarray:
-        return self.__state
+        ...
 
     @abstractmethod
     def transition(self, *args, **kwargs) -> None:

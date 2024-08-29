@@ -3,7 +3,7 @@
 import time
 import pygame
 import numpy as np
-from ..systems.simulation import Simulation
+from ..base.simulation import Simulation
 
 
 class PygameShapeDrawer:
