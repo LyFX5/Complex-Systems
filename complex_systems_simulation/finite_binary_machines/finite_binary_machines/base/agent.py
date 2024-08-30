@@ -7,13 +7,14 @@ class FiniteBinaryMachine(System):
     def __init__(self, init_state: np.ndarray):
         self.alphabet = [0, 1]
         self.set_state(init_state)
-        self.dimension = self.__state.shape[0] # number of variables / parameters / negentropy (if effective only) / number of bits / information
+        self.dimension = self.__state.shape[0] 
+        # number of variables / parameters / negentropy (if effective only) / number of bits / information
 
     @property
     def state(self) -> np.ndarray:
         return self.__state
 
-    def set_state(self, state: np.array) -> None:
+    def set_state(self, state: np.ndarray) -> None:
         assert all([bit in self.alphabet for bit in state]), "state is not binary"
         self.__state = state
 
