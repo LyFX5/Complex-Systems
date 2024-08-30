@@ -1,2 +1,2 @@
-from .system import System
+from .system import Agent
 from .simulation import Simulation
