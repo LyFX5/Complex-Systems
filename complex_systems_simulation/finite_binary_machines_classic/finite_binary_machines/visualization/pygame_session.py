@@ -107,8 +107,8 @@ class PygameSession:
             bit = self.draw_bit((bit_value == 1), x, y + i * self.bits_drawer.h) 
     
     def draw_matrix(self, matrix: np.ndarray):
-        x_for_all = self.meridian - self.bits_drawer.w * (self.columns_number  +  4) / 2
-        y_for_all = self.equator - self.bits_drawer.h * (self.rows_number -  6) / 2
+        x_for_all = self.meridian - self.bits_drawer.w * (self.columns_number + 2) / 2 # + 4
+        y_for_all = self.equator - self.bits_drawer.h * (self.rows_number - 2) / 2 # -6
         for j in range(self.columns_number):
             self.draw_column(matrix[: , j].reshape((self.rows_number, 1)), x_for_all + (j) * self.bits_drawer.w, y_for_all)
 
