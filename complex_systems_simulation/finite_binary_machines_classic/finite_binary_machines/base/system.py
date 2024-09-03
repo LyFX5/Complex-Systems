@@ -15,9 +15,10 @@ class System(ABC):
 
 
 class MultiAgent(System):
-    def __init__(self, init_state: np.ndarray):
+    def __init__(self, init_state: np.ndarray, finite: bool):
         self.alphabet = [0, 1]
         self.set_state(init_state)
+        self.finite = finite
         # self.life_rule_dict = {'0000': 0,
         #                  '0001': 1,
         #                  '0010': 1,
@@ -75,24 +76,24 @@ class MultiAgent(System):
         n, m = self.state.shape
         for i in range(1, n-1):
             for j in range(1, m-1):
-                # r = self.state[i][(j+1) % m]
-                # rt = self.state[(i-1) % n][(j+1) % m]
-                # t = self.state[(i-1) % n][j]
-                # lt = self.state[(i-1) % n][(j-1) % m]
-                # l = self.state[i][(j-1) % m]
-                # lb = self.state[(i+1) % n][(j-1) % m]
-                # b = self.state[(i+1) % n][j]
-                # rb = self.state[(i+1) % n][(j+1) % m]
-
-                r = self.state[i][j+1]
-                rt = self.state[i-1][j+1]
-                t = self.state[i-1][j]
-                lt = self.state[i-1][j-1]
-                l = self.state[i][j-1]
-                lb = self.state[i+1][j-1]
-                b = self.state[i+1][j]
-                rb = self.state[i+1][j+1]
-                
+                if self.finite:
+                    r = self.state[i][j+1]
+                    rt = self.state[i-1][j+1]
+                    t = self.state[i-1][j]
+                    lt = self.state[i-1][j-1]
+                    l = self.state[i][j-1]
+                    lb = self.state[i+1][j-1]
+                    b = self.state[i+1][j]
+                    rb = self.state[i+1][j+1]
+                else:
+                    r = self.state[i][(j+1) % m]
+                    rt = self.state[(i-1) % n][(j+1) % m]
+                    t = self.state[(i-1) % n][j]
+                    lt = self.state[(i-1) % n][(j-1) % m]
+                    l = self.state[i][(j-1) % m]
+                    lb = self.state[(i+1) % n][(j-1) % m]
+                    b = self.state[(i+1) % n][j]
+                    rb = self.state[(i+1) % n][(j+1) % m]
                 next_state[i][j] = self.map_life_game(self.state[i][j], [r, rt, t, lt, l, lb, b, rb])
         self.set_state(next_state)   
         
