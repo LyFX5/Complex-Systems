@@ -68,7 +68,10 @@ class PygameSession:
     def metrics_strings(self):
         return [f"Simulation Steps Left: {self.simulation_steps()}",
                 f"Number of Columns: {self.columns_number}",
-                f"Number of Rows: {self.rows_number}"]
+                f"Number of Rows: {self.rows_number}",
+                f"Entropy Total: {self.simulation.group.entropy_total}",
+                f"Entropy Analitical: {self.simulation.group.entropy_anal}",
+                f"Entropy by Frequent: {self.simulation.group.entropy_freq}"]
         
     def draw_text(self, text: str, x, y):
         green = (0, 255, 0)
@@ -93,6 +96,13 @@ class PygameSession:
         for m in range(len(metrics_strings)):
             metric_string = metrics_strings[m]
             self.draw_text(metric_string, table_coords[0], table_coords[1] + m * self.font_size)
+
+    def draw_lines(self):
+        blue = (0, 0, 128)
+        x_for_all = self.meridian # - self.bits_drawer.w * (self.columns_number + 4) / 2 # + 4
+        y_for_all = self.equator # - self.bits_drawer.h * (self.rows_number - 4) / 2 # -6
+        pygame.draw.line(self.screen, blue, [x_for_all, 0], [x_for_all, self.screen_size[1]])
+        pygame.draw.line(self.screen, blue, [0, y_for_all], [self.screen_size[0], y_for_all])
 
     def draw_bit(self, bit: bool, x, y):
         return self.bits_drawer.draw_shape(self.screen,
@@ -139,6 +149,7 @@ class PygameSession:
                 self.continue_simulation = True
             if self.continue_simulation and self.__simulation_steps > 0:
                 self.draw_snap(next(self.simulation))
+            self.draw_lines()
             self.draw_metrics_table()
         pygame.quit()        
 
