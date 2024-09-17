@@ -7,14 +7,14 @@ from ..base.simulation import Simulation
 
 
 class PygameShapeDrawer:
-    def __init__(self, simulation_area_side_len, bits_number_vertical, bits_number_horizontal, shape_string = "circle"):
-        self.bits_number_vertical = bits_number_vertical
-        self.bits_number_horizontal = bits_number_horizontal
+    def __init__(self, world_area_side_len, cells_number_vertical, cells_number_horizontal, shape_string = "circle"):
+        self.cells_number_vertical = cells_number_vertical
+        self.cells_number_horizontal = cells_number_horizontal
         self.shape_string = shape_string
-        if self.bits_number_vertical != self.bits_number_horizontal:
+        if self.cells_number_vertical != self.cells_number_horizontal:
             self.shape_string = "rectangle"
-        self.w = simulation_area_side_len / self.bits_number_horizontal
-        self.h = simulation_area_side_len / self.bits_number_vertical
+        self.w = world_area_side_len / self.cells_number_horizontal
+        self.h = world_area_side_len / self.cells_number_vertical
         self.diameter = min(self.w, self.h) # bit area side size / square area side size
         self.radius = self.diameter / 2
 
@@ -41,23 +41,23 @@ class PygameShapeDrawer:
 
 class PygameSession:
     def __init__(self, simulation: Simulation, by_mouse: bool, rendering_duration: float = 0.1):
+        self.by_mouse = by_mouse
+        self.visualization_title = 'Row of Binary Agents'
         # simulation
         self.simulation = simulation 
         self.__simulation_steps = self.simulation.steps_number
-        self.rows_number, self.columns_number = self.simulation.group.state.shape
+        self.bits_number, self.agents_number = self.simulation.group.state.shape
         # pygame
-        self.by_mouse = by_mouse
-        self.visualization_title = 'Finite Binary Machines'
         self.rendering_duration = rendering_duration
         self.screen_size = [1100, 900]
         self.meridian = self.screen_size[0] / 2 - 0.1 * self.screen_size[0]
         self.equator = self.screen_size[1] / 2
         self.screen_color = [250, 250, 250]
         self.bit_color = pygame.Color("aquamarine")
-        self.simulation_area_side_len = 800 
-        self.bits_drawer = PygameShapeDrawer(simulation_area_side_len = self.simulation_area_side_len, 
-                                              bits_number_vertical = self.rows_number, 
-                                              bits_number_horizontal = self.columns_number,
+        self.world_area_side_len = 800 
+        self.cells_drawer = PygameShapeDrawer(world_area_side_len = self.world_area_side_len, 
+                                              cells_number_vertical = self.bits_number, 
+                                              cells_number_horizontal = self.agents_number,
                                               shape_string = "circle")
         # writings
         self.font_size = 20
@@ -67,8 +67,10 @@ class PygameSession:
 
     def metrics_strings(self):
         return [f"Simulation Steps Left: {self.simulation_steps()}",
-                f"Number of Columns: {self.columns_number}",
-                f"Number of Rows: {self.rows_number}"]
+                f"Number of Agents: {self.agents_number}",
+                f"Number of each Agent's bits: {self.bits_number}",
+                f"{[int(self.simulation.group.state[i , :].sum()) for i in range(self.bits_number)]}",
+                ] # + [f"{self.simulation.group.adjacency_matrix[j]}" for j in range(self.agents_number)]
         
     def draw_text(self, text: str, x, y):
         green = (0, 255, 0)
@@ -95,25 +97,25 @@ class PygameSession:
             self.draw_text(metric_string, table_coords[0], table_coords[1] + m * self.font_size)
 
     def draw_bit(self, bit: bool, x, y):
-        return self.bits_drawer.draw_shape(self.screen,
-                                           self.bit_color if bit else self.screen_color,
-                                           x,
-                                           y)
+        return self.cells_drawer.draw_shape(self.screen,
+                                            self.bit_color if bit else self.screen_color,
+                                            x,
+                                            y)
         
-    def draw_column(self, column, x, y):
-        for i in range(self.rows_number):
-            bit_value = column[i]
+    def draw_agent_state(self, agent_state, x, y):
+        for i in range(agent_state.shape[0]):
+            bit_value = agent_state[i]
             assert bit_value in [0., 1.], f"some bits are not binary. {self.simulation.group.state=}"
-            bit = self.draw_bit((bit_value == 1), x, y + i * self.bits_drawer.h) 
+            bit = self.draw_bit((bit_value == 1), x, y + i * self.cells_drawer.h) 
     
-    def draw_matrix(self, matrix: np.ndarray):
-        x_for_all = self.meridian - self.bits_drawer.w * (self.columns_number + 4) / 2 # + 4
-        y_for_all = self.equator - self.bits_drawer.h * (self.rows_number - 4) / 2 # -6
-        for j in range(self.columns_number):
-            self.draw_column(matrix[: , j].reshape((self.rows_number, 1)), x_for_all + (j) * self.bits_drawer.w, y_for_all)
+    def draw_group_state(self, group_state: np.ndarray):
+        x_for_all = self.meridian - self.cells_drawer.w * (self.agents_number - 1) / 2
+        y_for_all = self.equator - self.cells_drawer.h * (self.bits_number - 1) / 2
+        for j in range(self.agents_number):
+            self.draw_agent_state(group_state[: , j].reshape((self.bits_number, 1)), x_for_all + (j) * self.cells_drawer.w, y_for_all)
 
     def draw_snap(self, group_state: np.ndarray):
-        self.draw_matrix(group_state)
+        self.draw_group_state(group_state)
         pygame.display.flip()
         self.__simulation_steps -= 1
         self.continue_simulation = False

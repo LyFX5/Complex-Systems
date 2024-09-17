@@ -1,10 +1,10 @@
 from typing import Iterator
 import numpy as np
-from .system import MultiAgent
+from .group import MultiAgentSystem
 
 
 class Simulation(Iterator):
-    def __init__(self, group: MultiAgent, steps_number: int):
+    def __init__(self, group: MultiAgentSystem, steps_number: int):
         self.group = group
         self.steps_number = steps_number
         
@@ -14,6 +14,4 @@ class Simulation(Iterator):
 
     def __iter__(self) -> Iterator:
         return self
-
-    # TODO calculate and render parameters analiticaly and frequency
         

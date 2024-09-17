@@ -74,9 +74,9 @@ class MultiAgent(System):
     def transition(self) -> None:
         next_state = copy(self.state)
         n, m = self.state.shape
-        for i in range(1, n-1):
-            for j in range(1, m-1):
-                if self.finite:
+        if self.finite:
+            for i in range(1, n-1):
+                for j in range(1, m-1):
                     r = self.state[i][j+1]
                     rt = self.state[i-1][j+1]
                     t = self.state[i-1][j]
@@ -85,7 +85,12 @@ class MultiAgent(System):
                     lb = self.state[i+1][j-1]
                     b = self.state[i+1][j]
                     rb = self.state[i+1][j+1]
-                else:
+                    current = self.state[i][j]
+                    neighbors = [r, rt, t, lt, l, lb, b, rb]
+                    next_state[i][j] = self.map_life_game(current, neighbors)
+        else:
+            for i in range(n):
+                for j in range(m):
                     r = self.state[i][(j+1) % m]
                     rt = self.state[(i-1) % n][(j+1) % m]
                     t = self.state[(i-1) % n][j]
@@ -94,7 +99,9 @@ class MultiAgent(System):
                     lb = self.state[(i+1) % n][(j-1) % m]
                     b = self.state[(i+1) % n][j]
                     rb = self.state[(i+1) % n][(j+1) % m]
-                next_state[i][j] = self.map_life_game(self.state[i][j], [r, rt, t, lt, l, lb, b, rb])
+                    current = self.state[i][j]
+                    neighbors = [r, rt, t, lt, l, lb, b, rb]
+                    next_state[i][j] = self.map_life_game(current, neighbors)
         self.set_state(next_state)   
         
     
