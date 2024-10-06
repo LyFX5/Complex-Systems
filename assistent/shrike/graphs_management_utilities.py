@@ -6,7 +6,7 @@ posts_dict = {"post_1": ["tag_1", "tag_2", "tag_3"], "post_2": ["tag_2"], "post_
 tags_dict = {"tag_1": ["post_1", "post_2", "post_3"], "tag_2": ["post_2"], "tag_3": ["post_2", "post_3"], "tag_4": ["post_1", "post_4"]}
 
 
-def pasts_to_tags_graph(posts_dict: dict, name: str, filename: str, label: str) -> Digraph:
+def posts_to_tags_graph(posts_dict: dict, name: str, filename: str, label: str) -> Digraph:
     gra = Digraph(name,
                   # filename=filename,
                   node_attr={'color': 'lightblue2', 'style': 'filled'})
